@@ -76,9 +76,9 @@ void itoa(long unsigned int value, char* result, int base)
 void Init_IOS()
 {
 	//Entradas
-	P1DIR &= ~BIT3;		// Ensure button is input (sets a 0 in P1DIR register at location BIT3)
-	P1OUT |=  BIT3;		//
-	P1REN |=  BIT3;		// Habilita o resistor de pullup no button
+	//P1DIR &= ~BIT3;		// Ensure button is input (sets a 0 in P1DIR register at location BIT3)
+	//P1OUT |=  BIT3;		//
+	//P1REN |=  BIT3;		// Habilita o resistor de pullup no button
 
 	//Saidas
 	P1OUT &= ~(BIT0);
@@ -115,8 +115,13 @@ void ConfigureAdc(void)
 	P1SEL |= BIT7;					// ADC input pin P1.7
 
 	ADC10CTL1 = INCH_7 + ADC10DIV_3 ;         // Channel 7, ADC10CLK/3
-	ADC10CTL0 = SREF_0 + ADC10SHT_3 + ADC10ON + ADC10IE;  // Vcc & Vss as reference, Sample and hold for 64 Clock cycles, ADC on, ADC interrupt enable
-	ADC10AE0 |= BIT7;                         // ADC input enable P1.7
+	//ADC10CTL1 = INCH_4 + ADC10DIV_3 ;         // Channel 4, ADC10CLK/3
+	//ADC10CTL1 = INCH_3 + ADC10DIV_3 ;         // Channel 3, ADC10CLK/3
+
+	ADC10CTL0 = SREF_7 + REFON + REFOUT + ADC10SHT_3 + ADC10ON + ADC10IE;  // VREF+ & VREF- as reference, Sample and hold for 64 Clock cycles, ADC on, ADC interrupt enable
+	//ADC10CTL0 = SREF_0 + ADC10SHT_3 + ADC10ON + ADC10IE;  // Vcc & Vss as reference, Sample and hold for 64 Clock cycles, ADC on, ADC interrupt enable
+
+	ADC10AE0 |= BIT7;                         // ADC input enable P1.7                      // ADC input enable P1.7
 
 	__enable_interrupt();			// Enable interrupts.
 }

@@ -60,6 +60,20 @@ int main(void)
 
     Toggle_P1(LED_1);
 
+    for(;;)     // loop infinito
+	{
+    	value = ReadAdc();
+
+    	itoa(value,charValue,10);	//Converte "value" para a string chamada "charValue"
+		UART_TX(charValue);			//Imprime na porta serial o valor em "charValue"
+		UART_TX("\r\n");  			//Pula a linha no terminal
+
+    	__delay_cycles(200000); 	//delay simples 1ms
+
+	}
+
+
+/*
 	for(;;)     // loop infinito
 	{
 		if(Read_P1(BUTTON)) // A chave foi pressionada?
@@ -104,6 +118,6 @@ int main(void)
 		Toggle_P1(LED_1);
 		Toggle_P1(LED_2);
 		__delay_cycles(100000); 	//delay simples
-	}
+	}*/
 }
 //---------------------------------------------------------------
