@@ -80,6 +80,10 @@ void Init_IOS()
 	//P1OUT |=  BIT3;		//
 	//P1REN |=  BIT3;		// Habilita o resistor de pullup no button
 
+	P1DIR &= ~BIT5;		// Ensure button is input (sets a 0 in P1DIR register at location BIT5)
+	P1OUT |=  BIT5;		//
+	P1REN |=  BIT5;		// Habilita o resistor de pullup no button
+
 	//Saidas
 	P1OUT &= ~(BIT0);
 	P1DIR |=  (BIT0);
@@ -151,5 +155,15 @@ void Toggle_P1(unsigned int canal)
 {
 	if( (P1OUT & canal) == canal ) P1OUT &= ~canal;
 	else P1OUT |= canal;
+}
+//---------------------------------------------------------------
+// Converte ADC 10Bits em Temperatura
+//---------------------------------------------------------------
+unsigned int ADC_to_Celcios(unsigned int adc)
+{
+	float celcios;
+	celcios = adc;
+	celcios = (celcios-230)*0.320675+22;
+	return (unsigned int)celcios;
 }
 //---------------------------------------------------------------

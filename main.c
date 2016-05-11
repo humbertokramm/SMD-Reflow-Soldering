@@ -5,7 +5,7 @@
 #include"msp430g2553.h"
 #include"stdio.h"
 
-#define BUTTON			BIT3
+#define BUTTON			BIT5
 #define LED_1			BIT0
 #define LED_2			BIT6
 
@@ -15,22 +15,11 @@
 //Global Variables
 unsigned int value;
 char charValue[10];
-unsigned int listValue[15] = {
-		100,	//indice 1
-		200,	//indice 2
-		300,	//indice 3
-		400,	//indice 4
-		500,	//indice 5
-		600,	//indice 6
-		700,	//indice 7
-		800,	//indice 8
-		900,	//indice 9
-		1000,	//indice 10
-		800,	//indice 11
-		600,	//indice 12
-		400,	//indice 13
-		200,	//indice 14
-		10		//indice 15
+
+unsigned int listValue[3][2] = {
+		{150,180},	//indice 1
+		{175,0},	//indice 2
+		{240,10}	//indice 3
 };
 
 
@@ -45,6 +34,7 @@ void ConfigureAdc(void);
 unsigned int ReadAdc(void);
 void OutPut_P1(unsigned int canal, unsigned int cmd);
 void Toggle_P1(unsigned int canal);
+unsigned int ADC_to_Celcios(unsigned int adc);
 //---------------------------------------------------------------
 int main(void)
 {
@@ -66,9 +56,22 @@ int main(void)
 
     	itoa(value,charValue,10);	//Converte "value" para a string chamada "charValue"
 		UART_TX(charValue);			//Imprime na porta serial o valor em "charValue"
-		UART_TX("\r\n");  			//Pula a linha no terminal
+		UART_TX("\t");  			//Pula a linha no terminal
 
-    	__delay_cycles(200000); 	//delay simples 1ms
+		value = ADC_to_Celcios(value);
+		itoa(value,charValue,10);	//Converte "value" para a string chamada "charValue"
+		UART_TX(charValue);			//Imprime na porta serial o valor em "charValue"
+		UART_TX(" °C\r\n");  			//Pula a linha no terminal
+
+		if(Read_P1(BUTTON)) // A chave foi pressionada?
+		{
+			Toggle_P1(LED_1);
+			Toggle_P1(LED_2);
+			__delay_cycles(100000); 	//delay simples
+		}
+
+
+    	__delay_cycles(200000); 	//delay simples 200ms
 
 	}
 
