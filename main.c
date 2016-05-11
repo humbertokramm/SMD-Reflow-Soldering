@@ -5,12 +5,14 @@
 #include"msp430g2553.h"
 #include"stdio.h"
 
-#define BUTTON			BIT5
+#define BUTTON_S1		BIT3
+#define BUTTON_S3		BIT5
+
 #define LED_1			BIT0
 #define LED_2			BIT6
 
-#define LED_VERMELHO	BIT0
-#define LED_VERDE		BIT6
+#define LED_VERMELHO	BIT6
+#define LED_VERDE		BIT0
 
 //Global Variables
 unsigned int value;
@@ -34,7 +36,7 @@ void ConfigureAdc(void);
 unsigned int ReadAdc(void);
 void OutPut_P1(unsigned int canal, unsigned int cmd);
 void Toggle_P1(unsigned int canal);
-unsigned int ADC_to_Celcios(unsigned int adc);
+unsigned int ADC_to_Celsius(unsigned int adc);
 //---------------------------------------------------------------
 int main(void)
 {
@@ -48,7 +50,6 @@ int main(void)
 
     ConfigureAdc();						//Configura a entrada Analógico/Digital
 
-    Toggle_P1(LED_1);
 
     for(;;)     // loop infinito
 	{
@@ -58,16 +59,68 @@ int main(void)
 		UART_TX(charValue);			//Imprime na porta serial o valor em "charValue"
 		UART_TX("\t");  			//Pula a linha no terminal
 
-		value = ADC_to_Celcios(value);
+		value = ADC_to_Celsius(value);
 		itoa(value,charValue,10);	//Converte "value" para a string chamada "charValue"
 		UART_TX(charValue);			//Imprime na porta serial o valor em "charValue"
 		UART_TX(" °C\r\n");  			//Pula a linha no terminal
 
-		if(Read_P1(BUTTON)) // A chave foi pressionada?
+		if(Read_P1(BUTTON_S3)) // A chave foi pressionada?
 		{
-			Toggle_P1(LED_1);
-			Toggle_P1(LED_2);
-			__delay_cycles(100000); 	//delay simples
+			unsigned int i = 0, timeDelay;
+
+			while(i < 3)
+			{
+				itoa(i,charValue,10);	//Converte "1" para a string chamada "charValue"
+				UART_TX(charValue);			//Imprime na porta serial o valor em "charValue"
+				UART_TX(":\t");  			//Pula a linha no terminal
+
+				value = ADC_to_Celsius(ReadAdc()); //Lê a temperatura
+				itoa(value,charValue,10);	//Converte "value" para a string chamada "charValue"
+				UART_TX(charValue);			//Imprime na porta serial o valor em "charValue"
+				UART_TX(" °C\r\n");  			//Pula a linha no terminal
+
+
+				//Fase 1: Pré Aquecimento
+				if(i == 0)
+				{
+					if(value >= 150)
+					{
+						i = 1;
+						timeDelay = 180;
+					}
+					else OutPut_P1(LED_VERDE,1);
+				}
+				//Fase 2: Ramp Up
+				if(i == 1)
+				{
+					if(timeDelay == 0)
+					{
+						i = 2;
+						timeDelay = 10;
+					}
+					if(value <= 175) OutPut_P1(LED_VERDE,1);
+					else OutPut_P1(LED_VERDE,0);
+				}
+				//Fase 3: Solda
+				if(i == 2)
+				{
+					if(timeDelay == 0) i = 3;
+					if(value <= 250) OutPut_P1(LED_VERDE,1);
+					else OutPut_P1(LED_VERDE,0);
+				}
+
+
+				if (timeDelay > 0) timeDelay--; //Decrementa 1 segundo
+				Toggle_P1(LED_2);
+				__delay_cycles(1000000); 	//delay simples 1ms
+			}
+			OutPut_P1(LED_VERDE,0);
+
+
+
+
+
+
 		}
 
 

@@ -159,11 +159,11 @@ void Toggle_P1(unsigned int canal)
 //---------------------------------------------------------------
 // Converte ADC 10Bits em Temperatura
 //---------------------------------------------------------------
-unsigned int ADC_to_Celcios(unsigned int adc)
+unsigned int ADC_to_Celsius(unsigned int adc)
 {
-	float celcios;
-	celcios = adc;
-	celcios = (celcios-230)*0.320675+22;
-	return (unsigned int)celcios;
+	float celsius;
+	celsius = adc;
+	celsius = (celsius-230)*0.320675+22;
+	return (unsigned int)celsius;
 }
 //---------------------------------------------------------------
